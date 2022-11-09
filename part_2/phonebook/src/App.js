@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 
+import personService from './services/persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
-import Persons from './components/Persons'
+import Person from './components/Person'
 
 
 const App = () => {
@@ -13,10 +13,10 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
+    personService
+      .getAll()
       .then(response => {
-        setPersons(response.data)
+        setPersons(response)
       })
   }, [])
 
@@ -32,18 +32,52 @@ const App = () => {
     setFilter(event.target.value)
   }
 
+  const handleDelete = ( id, personName )  => {
+    if (window.confirm(`Delete ${personName}?`)) {
+      personService
+        .deletePerson(id)
+        .then(() => 
+          setPersons(persons.filter(person => person.id !== id))
+        )
+        .catch(error => {
+          alert('the person was already deleted')
+        })
+    }
+  }
+
+  const updatePerson = (newObject) => {
+    const person = persons.find(person => person.name === newObject.name)
+    const personToUpdate = {...person, number: newObject.number}
+
+    personService
+      .update(person.id, newObject)
+      .then(resp => setPersons(persons.map(person => person.id === resp.id ? personToUpdate : person)))
+      .catch(error => {
+        alert(
+          `${person.name}' was already deleted from server`
+        )
+        setPersons(persons.filter(p => p.id !== person.id))
+      })
+  }
+
   const addName = (event) => {
     event.preventDefault()
+    const nameObj = {
+      name: newName,
+      number: newNumber,
+    }
     const isExist = persons.some(person => person.name === newName)
-    if(isExist)
-      window.alert(`${newName} is already added to phonebook`)
+    if(isExist) {
+      const message = `${newName} is already added to phonebook, replace the old number with a new one?`
+      if(window.confirm(message))
+        updatePerson(nameObj)
+    }
     else {
-      const nameObj = {
-        name: newName,
-        number: newNumber,
-        id: persons.length+1
-      }
-      setPersons(persons.concat(nameObj))
+      personService
+        .create(nameObj)
+        .then(response => 
+          setPersons(persons.concat(response))
+        )
     }
     
     setNewName('')
@@ -69,7 +103,18 @@ const App = () => {
         newNumber={newNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow}/>
+      <div>
+        {personsToShow.map(person => 
+          <div  key={person.id}>
+            <Person 
+              person={person}
+            />
+            <button onClick={() => handleDelete(person.id, person.name)}> delete </button> 
+          </div>
+         
+        )}
+      </div>
+      
     </div>
   )
 }

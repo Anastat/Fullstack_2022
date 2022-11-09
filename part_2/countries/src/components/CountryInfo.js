@@ -1,5 +1,4 @@
 const CountryInfo = ({country}) => {
-  console.log(country)
 	return (
 		<>
 			<p>capital {country.capital}</p>
