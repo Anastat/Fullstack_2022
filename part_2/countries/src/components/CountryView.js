@@ -3,7 +3,6 @@ import { useState } from 'react'
 
 const CountryView = ({country}) => {
   const [isShow, setShow] = useState(false)
-  console.log(country)
   if(!isShow)
     return (
       <button onClick={() => setShow(true)}> Show </button>
