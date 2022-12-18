@@ -70,7 +70,7 @@ const App = () => {
         setPersons(persons.map(person => person.id === resp.id ? personToUpdate : person))
       })
       .catch(error => {
-        setMessage(`Information of ${person.name} has already been removed from server`)
+        setMessage(error.response.data.error)
         setNotificationClass('error')
           setTimeout(() => {
             setMessage(null)
@@ -104,6 +104,14 @@ const App = () => {
           }, 5000)
 
           setPersons(persons.concat(response))
+        })
+        .catch(error => {
+          setMessage(error.response.data.error)
+          setNotificationClass('error')
+            setTimeout(() => {
+              setMessage(null)
+              setNotificationClass('')
+            }, 5000)
         })
     }
     
