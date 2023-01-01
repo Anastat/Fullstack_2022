@@ -1,5 +1,8 @@
-const blog = require('../models/blog')
+const User = require('../models/user')
 const Blog = require('../models/blog')
+const supertest = require('supertest')
+const app = require('../app')
+const api = supertest(app)
 
 const initialBlogs = [
   {
@@ -34,11 +37,47 @@ const initialBlogs = [
   }
 ]
 
+const initialUsers = [
+  {
+    username: "mluukkai",
+    name: "Matti Luukkainen",
+    password: "qwerty",
+  },
+  {
+    username: "hellas",
+    name: "Arto Hellas",
+    password: "qwerty",
+  },
+]
+
 const blogsInDb = async() => {
   const blogs = await Blog.find({})
   return blogs.map(blog => blog.toJSON())
 }
 
+const usersInDb = async () => {
+  const users = await User.find({})
+  return users.map(user => user.toJSON())
+}
+
+const token = async() => {
+  
+  const userToLogin = {
+    username: initialUsers[0].username,
+    password: initialUsers[0].password
+  }  
+
+  const response = await api
+    .post('/api/login')
+    .send(userToLogin)
+
+  return 'bearer ' + response.body.token
+}
+
 module.exports= {
-  initialBlogs, blogsInDb
+  initialBlogs, 
+  blogsInDb, 
+  initialUsers, 
+  usersInDb,
+  token
 }

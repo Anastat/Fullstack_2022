@@ -4,6 +4,8 @@ const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const config = require('../utils/config')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -12,6 +14,15 @@ beforeEach(async () => {
     blogObject = new Blog(blog)
     await blogObject.save()
   }
+
+  await User.deleteMany({})
+  
+  for (let user of helper.initialUsers) {
+    await api
+      .post('/api/users') 
+      .send(user)
+  }
+
 }, 100000)
 
 describe('Blogs api get request test', () => {
@@ -48,17 +59,18 @@ describe('Blogs api post a new blog test', () => {
       url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
       likes: 2,
     }  
+
+    const token = await helper.token()
+
     await api
       .post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
       .expect(201)
       .expect('Content-type',  /application\/json/)
    
-    const blogs = await api.get('/api/blogs')
-    expect(blogs.body).toHaveLength(helper.initialBlogs.length + 1)
-
-    const blogTitles = blogs.body.map(blog => blog.title)
-    expect(blogTitles).toContain('Type wars')
+    const blogs = await helper.blogsInDb()
+    expect(blogs).toHaveLength(helper.initialBlogs.length + 1)
 
   }, 100000)
 
@@ -68,8 +80,12 @@ describe('Blogs api post a new blog test', () => {
       author: "Robert C. Martin",
       url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     }  
+
+    const token = await helper.token()
+    
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
       .expect(201)
       .expect('Content-type',  /application\/json/)
@@ -83,13 +99,34 @@ describe('Blogs api post a new blog test', () => {
       author: "Robert C. Martin",
       url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     }  
+
+    const token = await helper.token()
+
     await api
       .post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
       .expect(400)
       
     const blogs = await helper.blogsInDb()
 
+    expect(blogs).toHaveLength(helper.initialBlogs.length)
+
+  }, 100000)
+
+  test('creation of a new blog without token failed', async () => {
+    const newBlog = {
+      title: "Type wars",
+      author: "Robert C. Martin",
+      url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+      likes: 2,
+    }  
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+   
+    const blogs = await helper.blogsInDb()
     expect(blogs).toHaveLength(helper.initialBlogs.length)
 
   }, 100000)
