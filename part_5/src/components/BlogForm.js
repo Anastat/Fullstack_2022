@@ -1,5 +1,36 @@
-const BlogForm = (props) => {
-  const {handleAddBlog, handleSetTitle, handleSetAuthor, handleSetUrl, title, author, url} = props
+import { useState } from 'react'
+
+const BlogForm = ({addBlog}) => {
+  const [newTitle, setNewTitle] = useState('') 
+  const [newAuthor, setNewAuthor] = useState('') 
+  const [newUrl, setNewUrl] = useState('') 
+
+  const handleSetTitle =(event) => {
+    setNewTitle(event.target.value)
+  }
+
+  const handleSetAuthor =(event) => {
+    setNewAuthor(event.target.value)
+  }
+
+  const handleSetUrl =(event) => {
+    setNewUrl(event.target.value)
+  }
+
+  const handleAddBlog = async(event) => {
+    event.preventDefault()
+    addBlog({
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl
+    })
+
+    setNewAuthor('')
+    setNewTitle('')
+    setNewUrl('')
+  }
+  
+  
   return (
     <>
       <h2>Create new</h2>
@@ -8,7 +39,7 @@ const BlogForm = (props) => {
           Title:
           <input
             type="text"
-            value={title}
+            value={newTitle}
             onChange={handleSetTitle}
           />
         </div>
@@ -16,7 +47,7 @@ const BlogForm = (props) => {
           Author:
           <input
             type="text"
-            value={author}
+            value={newAuthor}
             onChange={handleSetAuthor}
           />
         </div>
@@ -24,7 +55,7 @@ const BlogForm = (props) => {
           Url:
           <input
             type="text"
-            value={url}
+            value={newUrl}
             onChange={handleSetUrl}
           />
         </div>
