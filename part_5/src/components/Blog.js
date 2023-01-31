@@ -18,7 +18,6 @@ const Blog = ({blog, addLike, deleteBlog, userId}) => {
   }
 
   const isUserCreator = () => {
-    console.log("i'm here")
     return blog.user && blog.user.id === userId
   }
 
@@ -26,14 +25,14 @@ const Blog = ({blog, addLike, deleteBlog, userId}) => {
 
   return (
     <div style={blogStyle}>
-      <div>
+      <div className="blog-name-author">
         {blog.title} {blog.author} 
-        <button onClick={toggleVisibility}>{buttonText}</button>
+        <button className='btn-visibility' onClick={toggleVisibility}>{buttonText}</button>
       </div>
       { visible 
         ? <div>
-            <div>{blog.url}</div>
-            <div>Likes: {blog.likes}
+            <div className="blog-url">{blog.url}</div>
+            <div className="blog-likes">Likes: {blog.likes}
               <button onClick={() => addLike(blog.id)}>Like</button>
             </div>
             {
