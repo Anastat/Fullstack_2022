@@ -52,7 +52,7 @@ const App = () => {
       setPassword('')
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
     } catch (exception) {
-      setMessage('Wrong user name or password!')
+      setMessage('Wrong username or password!')
       setNotificationClass('error')
       setTimeout(() => {
         setMessage(null)
@@ -70,6 +70,9 @@ const App = () => {
 
     try {
       const newBlog = await blogService.create(blogToAdd)
+      // Response contains only user id.
+      newBlog.user = {id: user.id, name: user.name}
+
       setBlogs(blogs.concat(newBlog))
 
       setMessage(`A new blog '${newBlog.title}' by ${newBlog.author} added`)
@@ -156,11 +159,11 @@ const App = () => {
             <h2>blogs</h2>
             <Notification message={message} notificationClass={notificationClass}/>
             <p>{user.name} logged in</p>
-            <button onClick={() => handleLogout()}>Log out</button>
+            <button id="logout-btn" onClick={() => handleLogout()}>Log out</button>
             
             {blogForm()}
             <br></br>
-            <div>
+            <div id="blog-list">
               {blogs
                 .sort((a,b) => b.likes - a.likes)
                 .map(blog =>

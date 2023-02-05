@@ -24,7 +24,7 @@ const Blog = ({blog, addLike, deleteBlog, userId}) => {
   const buttonText = visible ? 'Hide' : 'View'
 
   return (
-    <div style={blogStyle}>
+    <div className="blog" style={blogStyle}>
       <div className="blog-name-author">
         {blog.title} {blog.author} 
         <button className='btn-visibility' onClick={toggleVisibility}>{buttonText}</button>
@@ -33,7 +33,7 @@ const Blog = ({blog, addLike, deleteBlog, userId}) => {
         ? <div>
             <div className="blog-url">{blog.url}</div>
             <div className="blog-likes">Likes: {blog.likes}
-              <button onClick={() => addLike(blog.id)}>Like</button>
+              <button id="add-like-btn" onClick={() => addLike(blog.id)}>Like</button>
             </div>
             {
               blog.user
@@ -42,7 +42,7 @@ const Blog = ({blog, addLike, deleteBlog, userId}) => {
             }
             {
               isUserCreator()
-              ? <button onClick={() => deleteBlog(blog.id)}>Delete</button>
+              ? <button id="delete-blog-btn" onClick={() => deleteBlog(blog.id)}>Delete</button>
               : null
             }
           </div>
