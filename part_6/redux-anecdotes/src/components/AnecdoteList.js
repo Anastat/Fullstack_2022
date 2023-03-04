@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { update } from '../requests'
+import { useNotificationDispatch } from '../NotificationContext'
 
 const AnecdoteList = ({allAnecdotes}) => {
   const queryClient = useQueryClient()
+  const dispatch = useNotificationDispatch()
 
   const updateVotesMutation = useMutation(update, {
     onSuccess: (updatedAnecdote) => {
@@ -13,6 +15,13 @@ const AnecdoteList = ({allAnecdotes}) => {
           anecdote.id !== id ? anecdote : updatedAnecdote
         )
       )
+      const message = `anecdote '${updatedAnecdote.content}' voted`
+
+      dispatch({type: 'ADD', payload: message })
+
+      setTimeout(() => {
+        dispatch({type: 'REMOVE'})
+      }, 5000)
     }
   })
 

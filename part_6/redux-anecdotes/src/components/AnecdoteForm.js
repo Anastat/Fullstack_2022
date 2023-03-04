@@ -1,13 +1,30 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { addNew } from '../requests'
+import { useNotificationDispatch } from '../NotificationContext'
 
 const NewAnecdote = () => {
   const queryClient =  useQueryClient() 
+  const dispatch = useNotificationDispatch()
 
   const newAnecdoteMutation = useMutation(addNew, {
     onSuccess: (newAnecdote) => {
       const anecdotes = queryClient.getQueryData('anecdotes')
       queryClient.setQueryData('anecdotes', anecdotes.concat(newAnecdote))
+
+      const message = `anecdote '${newAnecdote.content}' is created`
+      dispatch({type: 'ADD', payload: message })
+
+      setTimeout(() => {
+        dispatch({type: 'REMOVE'})
+      }, 5000)
+    },
+    onError: () => {
+      const message = 'too short anecdote, must have length 5 or more'
+      dispatch({type: 'ADD', payload: message })
+
+      setTimeout(() => {
+        dispatch({type: 'REMOVE'})
+      }, 5000)
     }
   })
   
