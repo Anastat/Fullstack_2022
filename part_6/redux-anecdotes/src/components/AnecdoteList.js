@@ -1,34 +1,30 @@
-import { useSelector, useDispatch } from 'react-redux'
-import { updateVotes } from '../reducers/anecdoteReducer'
-import { setNotification } from '../reducers/notificationReducer'
-import Notification from './Notification'
+import { useMutation, useQueryClient } from 'react-query'
+import { update } from '../requests'
 
-const AnecdoteList = () => {
-  const anecdotes = useSelector(state => {
-    if(state.filter === '')
-      return [...state.anecdotes]
-    return state.anecdotes.filter(anecdote => anecdote.content.includes(state.filter))
+const AnecdoteList = ({allAnecdotes}) => {
+  const queryClient = useQueryClient()
+
+  const updateVotesMutation = useMutation(update, {
+    onSuccess: (updatedAnecdote) => {
+      const anecdotes = queryClient.getQueryData('anecdotes')
+      const id = updatedAnecdote.id
+      queryClient.setQueryData('anecdotes',
+        anecdotes.map(anecdote =>
+          anecdote.id !== id ? anecdote : updatedAnecdote
+        )
+      )
+    }
   })
 
-  const notification = useSelector(state => state.notification)
-
-  const dispatch = useDispatch()
-
   const vote = (anecdote) => {
-    dispatch(updateVotes(anecdote.id))
-
-    dispatch(setNotification(`you voted '${anecdote.content}'`, 10))
+    updateVotesMutation.mutate({...anecdote, votes: anecdote.votes + 1})
   }
 
   return (
     <>
       <h2>Anecdotes</h2>
-      {notification.length > 0 
-        ? <Notification />
-        : null
-      }
       
-      {anecdotes.sort((a, b) => b.votes - a.votes).map(anecdote =>
+      {allAnecdotes.sort((a, b) => b.votes - a.votes).map(anecdote =>
         <div key={anecdote.id}>
           <div>
             {anecdote.content}
