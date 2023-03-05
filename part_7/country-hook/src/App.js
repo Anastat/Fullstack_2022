@@ -22,13 +22,13 @@ const useCountry = (name) => {
   useEffect(() => {
     if(name) {
       axios
-      .get(url)
-      .then(response => {
-        setCountry({...response.data[0], found: true})
-      })
-      .catch(error => {
-        setCountry({ found: false })
-      })
+        .get(url)
+        .then(response => {
+          setCountry({...response.data[0], found: true})
+        })
+        .catch(error => {
+          setCountry({ found: false })
+        })
     }
   }, [name, url])
 
