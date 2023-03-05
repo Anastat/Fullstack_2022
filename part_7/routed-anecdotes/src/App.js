@@ -1,11 +1,10 @@
 import { useState } from 'react'
+import { useField } from './hooks/index.js'
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Link,
-  Navigate,
-  useParams,
   useNavigate,
   useMatch
 } from "react-router-dom"
@@ -65,39 +64,58 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const content = useField('content')
+  const author = useField('author')
+  const info = useField('info')
   const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     })
     navigate('/')
   }
 
+  const handleReset = (e) => {
+    content.reset()
+    author.reset()
+    info.reset()
+  }
+
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} >
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input name='content' 
+            value={content.value} 
+            type={content.type}
+            onChange={content.onChange} 
+          />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input name='author' 
+            value={author.value} 
+            type={author.type}
+            onChange={author.onChange} 
+          />
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input name='info' 
+            value={info.value} 
+            type={info.type}
+            onChange={info.onChange} 
+          />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
+        <button type="reset" onClick={(event) => handleReset()}>reset</button>
       </form>
     </div>
   )
